@@ -40,4 +40,8 @@ if user_input:
     # Generate the bot response based on user input
     bot_response = generate_response(user_input)
     # Display the bot response
-    st.text_area("Bot Response", value=bot_response, height=50)
+    st.text_area("Bot Response", value=bot_response, height=200)
+
+    with st.expander('Conversation History'):
+        st.info("testing")
+
