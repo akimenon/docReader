@@ -77,5 +77,4 @@ def initChain(db):
 
 def chatPrompt(prompt, query):
     result = prompt({"question": query})
-    chat_memory.save_context(inputs={"human":query},outputs={"AI":result["answer"]})
     return result
