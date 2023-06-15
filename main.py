@@ -13,6 +13,7 @@ from langchain.llms import OpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
+import chromadb
 
 # imports
 import config
@@ -24,6 +25,10 @@ embeddings = OpenAIEmbeddings()
 
 #setup memory object
 chat_memory = ConversationBufferMemory(human_prefix="human",ai_prefix="AI", memory_key="chat_history", return_messages=True)
+# Db directory
+persist_directory = 'dbtxt'
+#initial DB
+vectordb = Chroma(persist_directory=persist_directory)
 
 # init method
 def init(db):
@@ -32,12 +37,6 @@ def init(db):
 
 
 # function to split the docs and prepare for storing
-def prepareDoc(doc):
-    loader = PyPDFLoader(doc)
-    documents = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=10)
-    return text_splitter.split_documents(documents)
-
 
 def prepareDocForUpload(uploaded_doc):
     print(type(uploaded_doc))
@@ -46,25 +45,13 @@ def prepareDocForUpload(uploaded_doc):
     return pdf_text_splitter.split_text(text=load_documents)
 
 
-# in memory loading
-# db = Chroma.from_documents(docs, embeddings)
-
-# persist data in DB
-def loadToDB(docs):
-    # Db directory
-    persist_directory = 'db'
-    # init and load data
-    vectordb = Chroma.from_documents(documents=docs, embedding=embeddings, persist_directory=persist_directory)
-    vectordb.persist()
-    print("done persist!!!!!")
-    return vectordb
+def clearDB():
+    vectordb.delete_collection()
 
 
 def loadTextoDB(text):
-    # Db directory
-    persist_directory = 'dbtxt'
     # init and load data
-    vectordb = Chroma.from_texts(texts=text, embedding=embeddings, persist_directory=persist_directory)
+    vectordb = Chroma.from_texts(texts=text,embedding=embeddings,persist_directory=persist_directory)
     vectordb.persist()
     print("done persist text!!!!!")
     return vectordb
@@ -72,7 +59,7 @@ def loadTextoDB(text):
 
 # set LLMChains
 def initChain(db):
-    return ConversationalRetrievalChain.from_llm(OpenAI(temperature=0),
+    return ConversationalRetrievalChain.from_llm(OpenAI(temperature=0.5),
                                                  db.as_retriever(search_type="mmr"), memory=chat_memory, verbose=True)
 
 def chatPrompt(prompt, query):

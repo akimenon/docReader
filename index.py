@@ -1,8 +1,6 @@
 import langchain
 import pypdf
-import streamlit
 import streamlit as st
-
 import main
 
 # Set the title and page layout
@@ -10,7 +8,11 @@ st.title("DocReader GPT")
 st.image('docReader.png')
 st.sidebar.title("Options Menu")
 # upload file button
-uploaded_file = st.sidebar.file_uploader("Choose a file", type=['pdf'])
+uploaded_file = st.sidebar.file_uploader("Choose a file", type=['pdf', 'json'])
+def setRefreshDB():
+    main.clearDB()
+
+st.sidebar.button("Delete all data", on_click=setRefreshDB)
 
 if uploaded_file is not None:
     # convert PDF to list
@@ -47,7 +49,4 @@ if user_input:
             if isinstance(messages, langchain.schema.HumanMessage):
                 st.divider()
             st.info(messages.content)
-
-
-
 
