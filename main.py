@@ -22,6 +22,8 @@ import utils
 os.environ["OPENAI_API_KEY"] = config.openai_apikey
 embeddings = OpenAIEmbeddings()
 
+#setup memory object
+chat_memory = ConversationBufferMemory(human_prefix="human",ai_prefix="AI", memory_key="chat_history", return_messages=True)
 
 # init method
 def init(db):
@@ -70,10 +72,8 @@ def loadTextoDB(text):
 
 # set LLMChains
 def initChain(db):
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     return ConversationalRetrievalChain.from_llm(OpenAI(temperature=0),
-                                                 db.as_retriever(search_type="mmr"), memory=memory, verbose=True)
-
+                                                 db.as_retriever(search_type="mmr"), memory=chat_memory, verbose=True)
 
 def chatPrompt(prompt, query):
     result = prompt({"question": query})
