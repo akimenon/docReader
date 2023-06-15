@@ -3,3 +3,4 @@ dbtxt/*
 .chroma
 venv
 __pycache__/*
+config.py
