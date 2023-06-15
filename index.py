@@ -7,7 +7,7 @@ import main
 
 # Set the title and page layout
 st.title("DocReader GPT")
-st.image('/Users/akhmenon/Desktop/gpt/docReader.png')
+st.image('docReader.png')
 st.sidebar.title("Options Menu")
 # upload file button
 uploaded_file = st.sidebar.file_uploader("Choose a file", type=['pdf'])
