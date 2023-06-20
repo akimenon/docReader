@@ -42,17 +42,13 @@ if user_input:
     # Generate the bot response based on user input
     bot_response = generate_response(user_input)
     # Display the bot response
-    st.text_area("Bot Response", value=bot_response["answer"], height=200)
-    #print(bot_response['source_documents'])
+    print(bot_response['output'])
+    st.text_area("Bot Response", value=bot_response['output'], height=200)
+    #print(bot_response[0])
 
     with st.expander('Conversation History'):
         for messages in bot_response['chat_history']:
             if isinstance(messages, langchain.schema.HumanMessage):
                 st.divider()
             st.info(messages.content)
-    with st.expander('Source'):
-            srcdoc=bot_response['source_documents'][0].page_content
-            print(srcdoc)
-            srcdoc=srcdoc.replace('\n',' ')
-            st.info(srcdoc)
 
