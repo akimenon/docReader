@@ -2,7 +2,7 @@
 
 # convert PDF to text
 def textfrompdf(pdfDocument):
-    print(len(pdfDocument.pages))
+    #print(len(pdfDocument.pages))
     # Create an empty list to store documents
     text = ""
 
