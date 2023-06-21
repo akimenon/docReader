@@ -13,6 +13,7 @@ from langchain.llms import OpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
+from langchain.chat_models import ChatOpenAI
 
 # imports
 import config
@@ -25,11 +26,14 @@ embeddings = OpenAIEmbeddings()
 #setup memory object
 chat_memory = ConversationBufferMemory(human_prefix="human",ai_prefix="AI", memory_key="chat_history", return_messages=True)
 
+#db directory
+persist_directory = 'dbtxt'
+
+model=ChatOpenAI(temperature=0)
 # init method
 def init(db):
     prompt = initChain(db)
     return prompt
-
 
 # function to split the docs and prepare for storing
 def prepareDoc(doc):
@@ -40,8 +44,9 @@ def prepareDoc(doc):
 
 
 def prepareDocForUpload(uploaded_doc):
-    print(type(uploaded_doc))
+    #print(type(uploaded_doc))
     load_documents = utils.textfrompdf(uploaded_doc)
+    #print(load_documents)
     pdf_text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=10)
     return pdf_text_splitter.split_text(text=load_documents)
 
@@ -60,11 +65,9 @@ def loadToDB(docs):
     return vectordb
 
 
-def loadTextoDB(text):
-    # Db directory
-    persist_directory = 'dbtxt'
+def loadTextoDB(txtList):
     # init and load data
-    vectordb = Chroma.from_texts(texts=text, embedding=embeddings, persist_directory=persist_directory)
+    vectordb = Chroma.from_texts(texts=txtList, embedding=embeddings, persist_directory=persist_directory)
     vectordb.persist()
     print("done persist text!!!!!")
     return vectordb
@@ -72,7 +75,7 @@ def loadTextoDB(text):
 
 # set LLMChains
 def initChain(db):
-    return ConversationalRetrievalChain.from_llm(OpenAI(temperature=0),
+    return ConversationalRetrievalChain.from_llm(model,
                                                  db.as_retriever(search_type="mmr"), memory=chat_memory, verbose=True)
 
 def chatPrompt(prompt, query):
