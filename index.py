@@ -10,17 +10,28 @@ st.title("DocReader GPT")
 st.image('docReader.png')
 st.sidebar.title("Options Menu")
 # upload file button
-uploaded_file = st.sidebar.file_uploader("Choose a file", type=['pdf'])
+uploaded_files = st.sidebar.file_uploader("Choose a file", type=['pdf'],accept_multiple_files=True)
 
-if uploaded_file is not None:
+def visDB():
+    main.visDB()
+
+visualizeDB=st.button(label="visualize vector DB", on_click=visDB)
+
+if uploaded_files is not None:
     # convert PDF to list
-    pdf = pypdf.PdfReader(uploaded_file)
-    txt = main.prepareDocForUpload(pdf)
-    db = main.loadTextoDB(txt)
+    txtList = []
+    for file in uploaded_files:
+        pdf = pypdf.PdfReader(file)
+        txtList = main.prepareDocForUpload(pdf)
+
+    db = main.loadTextoDB(txtList)
+    #uploaded_files.clear()
     prompt = main.init(db)
+
 
 # Create a text input for user input
 user_input = st.text_input("Load a pdf file to begin....", "")
+
 
 
 # init prompt
